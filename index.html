@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calcul de Moyenne Générale</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .controls-section {
+            background: #f8f9ff;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 2px solid #e0e6ff;
+        }
+        
+        .controls-title {
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+        }
+        
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .control-group {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #e0e6ff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .control-group h4 {
+            margin: 0 0 15px 0;
+            color: #4facfe;
+            font-size: 1.1em;
+        }
+        
+        .weight-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .weight-input {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .weight-input label {
+            font-weight: 500;
+            color: #555;
+            min-width: 30px;
+        }
+        
+        .weight-input input {
+            width: 60px;
+            padding: 8px;
+            border: 2px solid #e0e6ff;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .weight-input input:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 5px rgba(79, 172, 254, 0.3);
+        }
+        
+        .total-display {
+            font-weight: bold;
+            padding: 8px 12px;
+            background: #e8f4f8;
+            border-radius: 5px;
+            color: #333;
+            border: 2px solid transparent;
+        }
+        
+        .total-display.invalid {
+            background: #ffe6e6;
+            border-color: #ff6b6b;
+            color: #d63031;
+        }
+        
+        .total-display.valid {
+            background: #e8f5e8;
+            border-color: #27ae60;
+            color: #27ae60;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 10px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        
+        td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9em;
+        }
+        
+        tr:hover {
+            background: #f8f9ff;
+        }
+        
+        .note-finale {
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .grade-input {
+            width: 60px;
+            padding: 4px 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 0.9em;
+            background: #f9f9f9;
+        }
+        
+        .grade-input:focus {
+            outline: none;
+            border-color: #4facfe;
+            background: white;
+            box-shadow: 0 0 3px rgba(79, 172, 254, 0.3);
+        }
+        
+        .grade-input:disabled {
+            background: #f5f5f5;
+            color: #999;
+            cursor: not-allowed;
+        }
+        
+        .coefficient {
+            font-weight: bold;
+            color: #764ba2;
+        }
+        
+        .summary {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .moyenne-finale {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #333;
+            margin: 10px 0;
+        }
+        
+        .total-coefficients {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .formula {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            border-left: 4px solid #4facfe;
+        }
+        
+        .reset-btn {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-top: 15px;
+            transition: transform 0.2s;
+        }
+        
+        .reset-btn:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Calcul de Moyenne Générale</h1>
+            <p style="margin: 10px 0 0 0; opacity: 0.9;">Règles de pondération personnalisables</p>
+        </div>
+        
+        <div class="content">
+            <div class="controls-section">
+                <h3 class="controls-title">⚙️ Configuration des Règles de Pondération</h3>
+                <div class="controls-grid">
+                    <div class="control-group">
+                        <h4>📋 CC + TP + Examen</h4>
+                        <div class="weight-controls">
+                            <div class="weight-input">
+                                <label>CC:</label>
+                                <input type="number" id="cc-tp-exam-cc" value="20" min="0" max="100">
+                                <span>%</span>
+                            </div>
+                            <div class="weight-input">
+                                <label>TP:</label>
+                                <input type="number" id="cc-tp-exam-tp" value="20" min="0" max="100">
+                                <span>%</span>
+                            </div>
+                            <div class="weight-input">
+                                <label>Exam:</label>
+                                <input type="number" id="cc-tp-exam-exam" value="60" min="0" max="100">
+                                <span>%</span>
+                            </div>
+                            <div class="total-display" id="total-cc-tp-exam">Total: 100%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <h4>📝 CC + Examen</h4>
+                        <div class="weight-controls">
+                            <div class="weight-input">
+                                <label>CC:</label>
+                                <input type="number" id="cc-exam-cc" value="40" min="0" max="100">
+                                <span>%</span>
+                            </div>
+                            <div class="weight-input">
+                                <label>Exam:</label>
+                                <input type="number" id="cc-exam-exam" value="60" min="0" max="100">
+                                <span>%</span>
+                            </div>
+                            <div class="total-display" id="total-cc-exam">Total: 100%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <h4>🧪 TP + Examen</h4>
+                        <div class="weight-controls">
+                            <div class="weight-input">
+                                <label>TP:</label>
+                                <input type="number" id="tp-exam-tp" value="40" min="0" max="100">
+                                <span>%</span>
+                            </div>
+                            <div class="weight-input">
+                                <label>Exam:</label>
+                                <input type="number" id="tp-exam-exam" value="60" min="0" max="100">
+                                <span>%</span>
+                            </div>
+                            <div class="total-display" id="total-tp-exam">Total: 100%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <h4>📖 Examen Seulement</h4>
+                        <div class="weight-controls">
+                            <div class="weight-input">
+                                <label>Exam:</label>
+                                <input type="number" id="exam-only" value="100" min="0" max="100" readonly>
+                                <span>%</span>
+                            </div>
+                            <div class="total-display valid">Total: 100%</div>
+                        </div>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 15px; margin-top: 20px;">
+                    <button class="reset-btn" onclick="resetWeights()">🔄 Réinitialiser aux valeurs par défaut</button>
+                    <button class="reset-btn" onclick="clearAllGrades()" style="background: linear-gradient(135deg, #ffa726 0%, #ff9800 100%);">🗑️ Effacer toutes les notes</button>
+                </div>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Matière</th>
+                        <th>Coef</th>
+                        <th>CC</th>
+                        <th>TP</th>
+                        <th>Examen</th>
+                        <th>Règle Appliquée</th>
+                        <th>Note Finale</th>
+                        <th>Coef × Note</th>
+                    </tr>
+                </thead>
+                <tbody id="grades-table">
+                </tbody>
+            </table>
+            
+            <div class="summary">
+                <div class="total-coefficients" id="total-coeff">Total des Coefficients : 0</div>
+                <div class="moyenne-finale" id="moyenne-finale">0.00</div>
+                <div class="formula" id="formula">Calcul en cours...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const matieres = [
+            {nom: "Administration des bases de données", coef: 2, cc: null, tp: null, exam: null},
+            {nom: "Analyse et Décisions Financières", coef: 1.5, cc: null, tp: null, exam: null},
+            {nom: "Business Model d'une Startup", coef: 0.5, cc: null, tp: null, exam: null},
+            {nom: "Compétences Professionnelles - Anglais", coef: 2, cc: null, tp: null, exam: null},
+            {nom: "Compétences Professionnelles - Français", coef: 2, cc: null, tp: null, exam: null},
+            {nom: "Complexité appliquée à la RO", coef: 1, cc: null, tp: null, exam: null},
+            {nom: "Deep learning", coef: 2.5, cc: null, tp: null, exam: null},
+            {nom: "Environnement & Stratégies de l'entreprise", coef: 1.5, cc: null, tp: null, exam: null},
+            {nom: "Graphes et applications", coef: 2, cc: null, tp: null, exam: null},
+            {nom: "Informatique Décisionnelle", coef: 3, cc: null, tp: null, exam: null},
+            {nom: "Innovation & Entrepreneuriat_Ideation Camp", coef: 1.5, cc: null, tp: null, exam: null},
+            {nom: "Machine Learning", coef: 3.5, cc: null, tp: null, exam: null},
+            {nom: "Mission Entreprise", coef: 10, cc: null, tp: null, exam: null},
+            {nom: "Natural Language Processing", coef: 2, cc: null, tp: null, exam: null},
+            {nom: "Programmation linéaire", coef: 2, cc: null, tp: null, exam: null},
+            {nom: "Sécurité informatique", coef: 2, cc: null, tp: null, exam: null},
+            {nom: "Système d'exploitation avancé I", coef: 2, cc: null, tp: null, exam: null},
+            {nom: "Techniques d'estimation pour l'ingénieur", coef: 4, cc: null, tp: null, exam: null}
+        ];
+
+        function getWeights() {
+            return {
+                ccTpExam: {
+                    cc: parseInt(document.getElementById('cc-tp-exam-cc').value) / 100,
+                    tp: parseInt(document.getElementById('cc-tp-exam-tp').value) / 100,
+                    exam: parseInt(document.getElementById('cc-tp-exam-exam').value) / 100
+                },
+                ccExam: {
+                    cc: parseInt(document.getElementById('cc-exam-cc').value) / 100,
+                    exam: parseInt(document.getElementById('cc-exam-exam').value) / 100
+                },
+                tpExam: {
+                    tp: parseInt(document.getElementById('tp-exam-tp').value) / 100,
+                    exam: parseInt(document.getElementById('tp-exam-exam').value) / 100
+                },
+                examOnly: {
+                    exam: 1.0
+                }
+            };
+        }
+
+        function calculerNoteFinale(matiere) {
+            const {cc, tp, exam} = matiere;
+            const weights = getWeights();
+            
+            // Skip calculation if no grades are entered
+            if (cc === null && tp === null && exam === null) {
+                return 0;
+            }
+            
+            if (cc !== null && tp !== null && exam !== null) {
+                return weights.ccTpExam.cc * cc + weights.ccTpExam.tp * tp + weights.ccTpExam.exam * exam;
+            } else if (cc !== null && exam !== null && tp === null) {
+                return weights.ccExam.cc * cc + weights.ccExam.exam * exam;
+            } else if (tp !== null && exam !== null && cc === null) {
+                return weights.tpExam.tp * tp + weights.tpExam.exam * exam;
+            } else if (exam !== null && cc === null && tp === null) {
+                return weights.examOnly.exam * exam;
+            }
+            return 0;
+        }
+
+        function getRegleAppliquee(matiere) {
+            const {cc, tp, exam} = matiere;
+            const weights = getWeights();
+            
+            if (cc !== null && tp !== null && exam !== null) {
+                return `${Math.round(weights.ccTpExam.cc * 100)}% CC + ${Math.round(weights.ccTpExam.tp * 100)}% TP + ${Math.round(weights.ccTpExam.exam * 100)}% Exam`;
+            } else if (cc !== null && exam !== null) {
+                return `${Math.round(weights.ccExam.cc * 100)}% CC + ${Math.round(weights.ccExam.exam * 100)}% Exam`;
+            } else if (tp !== null && exam !== null) {
+                return `${Math.round(weights.tpExam.tp * 100)}% TP + ${Math.round(weights.tpExam.exam * 100)}% Exam`;
+            } else if (exam !== null) {
+                return "100% Exam";
+            }
+            return "N/A";
+        }
+
+        function updateTotals() {
+            // CC + TP + Exam
+            const ccTpExamTotal = parseInt(document.getElementById('cc-tp-exam-cc').value) + 
+                                parseInt(document.getElementById('cc-tp-exam-tp').value) + 
+                                parseInt(document.getElementById('cc-tp-exam-exam').value);
+            const ccTpExamDiv = document.getElementById('total-cc-tp-exam');
+            ccTpExamDiv.textContent = `Total: ${ccTpExamTotal}%`;
+            ccTpExamDiv.className = ccTpExamTotal === 100 ? 'total-display valid' : 'total-display invalid';
+
+            // CC + Exam
+            const ccExamTotal = parseInt(document.getElementById('cc-exam-cc').value) + 
+                               parseInt(document.getElementById('cc-exam-exam').value);
+            const ccExamDiv = document.getElementById('total-cc-exam');
+            ccExamDiv.textContent = `Total: ${ccExamTotal}%`;
+            ccExamDiv.className = ccExamTotal === 100 ? 'total-display valid' : 'total-display invalid';
+
+            // TP + Exam
+            const tpExamTotal = parseInt(document.getElementById('tp-exam-tp').value) + 
+                               parseInt(document.getElementById('tp-exam-exam').value);
+            const tpExamDiv = document.getElementById('total-tp-exam');
+            tpExamDiv.textContent = `Total: ${tpExamTotal}%`;
+            tpExamDiv.className = tpExamTotal === 100 ? 'total-display valid' : 'total-display invalid';
+
+            // Recalculer le tableau
+            afficherTableau();
+        }
+
+        function afficherTableau() {
+            const tbody = document.getElementById('grades-table');
+            tbody.innerHTML = ''; // Clear existing rows
+            
+            let sommePonderee = 0;
+            let sommeCoefficients = 0;
+
+            matieres.forEach((matiere, index) => {
+                const noteFinal = calculerNoteFinale(matiere);
+                const produit = matiere.coef * noteFinal;
+                sommePonderee += produit;
+                sommeCoefficients += matiere.coef;
+
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${matiere.nom}</td>
+                    <td class="coefficient">${matiere.coef}</td>
+                    <td><input type="number" class="grade-input" ${matiere.cc !== null ? `value="${matiere.cc}"` : 'placeholder="CC"'} step="0.01" min="0" max="20" onchange="updateGrade(${index}, 'cc', this.value)"></td>
+                    <td><input type="number" class="grade-input" ${matiere.tp !== null ? `value="${matiere.tp}"` : 'placeholder="TP"'} step="0.01" min="0" max="20" onchange="updateGrade(${index}, 'tp', this.value)"></td>
+                    <td><input type="number" class="grade-input" ${matiere.exam !== null ? `value="${matiere.exam}"` : 'placeholder="Exam"'} step="0.01" min="0" max="20" onchange="updateGrade(${index}, 'exam', this.value)"></td>
+                    <td>${getRegleAppliquee(matiere)}</td>
+                    <td class="note-finale">${noteFinal.toFixed(2)}</td>
+                    <td>${produit.toFixed(2)}</td>
+                `;
+            });
+
+            const moyenneGenerale = sommePonderee / sommeCoefficients;
+
+            document.getElementById('total-coeff').textContent = `Total des Coefficients : ${sommeCoefficients}`;
+            document.getElementById('moyenne-finale').textContent = moyenneGenerale.toFixed(2);
+            document.getElementById('formula').innerHTML = `
+                <strong>Formule :</strong> (${sommePonderee.toFixed(2)}) ÷ ${sommeCoefficients} = ${moyenneGenerale.toFixed(2)}
+            `;
+        }
+
+        function updateGrade(index, type, value) {
+            if (value === '' || value === null) {
+                matieres[index][type] = null;
+            } else {
+                const numValue = parseFloat(value);
+                if (!isNaN(numValue) && numValue >= 0 && numValue <= 20) {
+                    matieres[index][type] = numValue;
+                }
+            }
+            afficherTableau(); // Recalculate everything
+        }
+
+        function clearAllGrades() {
+            if (confirm('Êtes-vous sûr de vouloir effacer toutes les notes ?')) {
+                matieres.forEach(matiere => {
+                    matiere.cc = null;
+                    matiere.tp = null;
+                    matiere.exam = null;
+                });
+                afficherTableau();
+            }
+        }
+
+        function resetWeights() {
+            document.getElementById('cc-tp-exam-cc').value = 20;
+            document.getElementById('cc-tp-exam-tp').value = 20;
+            document.getElementById('cc-tp-exam-exam').value = 60;
+            document.getElementById('cc-exam-cc').value = 40;
+            document.getElementById('cc-exam-exam').value = 60;
+            document.getElementById('tp-exam-tp').value = 40;
+            document.getElementById('tp-exam-exam').value = 60;
+            updateTotals();
+        }
+
+        // Add event listeners to all weight inputs
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('input[type="number"]:not([readonly])');
+            inputs.forEach(input => {
+                input.addEventListener('input', updateTotals);
+            });
+
+            // Initialize
+            updateTotals();
+        });
+    </script>
+</body>
+</html>
